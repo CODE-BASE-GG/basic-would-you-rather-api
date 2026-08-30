@@ -1,4 +1,6 @@
 
+// Added all ts shits, no need for re-adding
+
 const list = [
 	{
 		"left": "Never be able to use a modal editor (like Neovim/Helix) again",
