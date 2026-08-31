@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { handle } from 'hono/vercel'
 import { connectToDatabase } from './lib/db.ts'
 import ratherList from "./rathers_list.ts"
 
@@ -30,13 +31,22 @@ app.post('/add_test', async (c) => {
   return c.json({ "didFail": false, "ids": insertedIdList });
 })
 */
+app.get('/', async (c) => {
+  return c.json({ wonderful_message: "It works fammy goodluck!" }, 200)
+});
 
 // Routes
 app.route('/rathers', rathersRoutes);
 
-serve({
-  fetch: app.fetch,
-  port: 3000
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
-})
+// Run local server ONLY when not executing on Vercel
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  serve({
+    fetch: app.fetch,
+    port: 3000
+  }, (info) => {
+    console.log(`Server is running on http://localhost:${info.port}`)
+  })
+}
+
+// Export for Vercel
+export default handle(app)
