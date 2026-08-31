@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { connectToDatabase } from "../lib/db.ts";
-import voteRoute from "./vote.ts";
 
 const app = new Hono();
 
@@ -34,7 +33,8 @@ app.get('/get/:offset', async (c) => {
 })
 
 
-// ---------------  Voting Operations -----------------
+// Routes
+import voteRoute from "./vote.ts";
 app.route('/vote', voteRoute);
 
 export default app;

@@ -8,10 +8,6 @@ import rathersRoutes from "./routes/rathers.ts"
 
 const app = new Hono()
 
-app.get('/', (c) => {
-  return c.json({"message": "Hello world!"});
-})
-
 /*
 app.post('/add_test', async (c) => {
   const { db } = await connectToDatabase();
