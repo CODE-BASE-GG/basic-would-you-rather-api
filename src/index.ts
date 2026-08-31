@@ -31,7 +31,7 @@ app.post('/add_test', async (c) => {
   return c.json({ "didFail": false, "ids": insertedIdList });
 })
 */
-app.get('/', async (c) => {
+app.get('/', (c) => {
   return c.json({ wonderful_message: "It works fammy goodluck!" }, 200)
 });
 
@@ -49,4 +49,4 @@ if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
 }
 
 // Export for Vercel
-export default handle(app)
+export default app
