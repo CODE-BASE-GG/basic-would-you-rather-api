@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { cors } from "hono/cors";
 import { handle } from 'hono/vercel'
 import { connectToDatabase } from './lib/db.ts'
 import ratherList from "./rathers_list.ts"
@@ -8,6 +9,16 @@ import ratherList from "./rathers_list.ts"
 import rathersRoutes from "./routes/rathers.ts"
 
 const app = new Hono()
+
+
+app.use('*', cors({
+  origin: [
+    'http://localhost:5050'
+  ],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 600,
+}))
 
 /*
 app.post('/add_test', async (c) => {
