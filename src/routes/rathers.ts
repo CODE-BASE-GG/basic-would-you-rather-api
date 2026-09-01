@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { connectToDatabase } from "../lib/db.ts";
+import { cors } from "hono/cors";
 
 const app = new Hono();
 
@@ -36,5 +37,11 @@ app.get('/get/:offset', async (c) => {
 // Routes
 import voteRoute from "./vote.ts";
 app.route('/vote', voteRoute);
+
+app.use('/*', cors({
+  origin: [
+    'http://localhost:5050',
+  ],
+}))
 
 export default app;
