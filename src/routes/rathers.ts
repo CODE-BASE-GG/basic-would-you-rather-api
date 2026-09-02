@@ -26,7 +26,9 @@ app.get('/get/:offset', async (c) => {
   if (total_skip >= latest_index) 
     return c.json({ isSuccess: false, message: "You're skipping too much fam" }, 400);
 
-  const get_rathers = await db.collection('tests').find().skip(total_skip).limit(per_count).toArray();
+  const get_rathers = await db.collection('tests')
+                      .find({ id_index: {"$type": "number"} })
+                      .skip(total_skip).limit(per_count).toArray();
 
   //let ratherIndex = getRandomInt(0, 29);
   return c.json({ isSuccess: true, rathers: get_rathers });
