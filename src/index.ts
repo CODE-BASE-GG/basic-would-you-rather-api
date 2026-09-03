@@ -14,7 +14,7 @@ const app = new Hono()
 app.use('*', cors({
   origin: [
     'http://localhost:5050',
-    'https://wyr-banacount.netlify.app/'
+    'https://wyr-banacount.netlify.app'
   ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
