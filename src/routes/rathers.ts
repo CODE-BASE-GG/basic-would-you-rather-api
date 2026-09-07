@@ -36,7 +36,7 @@ app.get('/get/:offset', async (c) => {
 
 app.get('/request_add_rather', async (c) => {
   const query = c.req.query();
-  const ratherAddDelayInHours = 1;
+  const ratherAddDelayInHours = 6;
 
   if (!query.left_rather || !query.right_rather) 
     return c.json({ message: "Lacking rather statement!", isSuccess: false }, 400);
