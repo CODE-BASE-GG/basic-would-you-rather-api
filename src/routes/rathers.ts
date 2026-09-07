@@ -42,10 +42,12 @@ app.get('/request_add_rather', async (c) => {
     return c.json({ message: "Lacking rather statement!", isSuccess: false }, 400);
 
   const { db } = await connectToDatabase();
-  const get_last_add = await db.collection('tests').find({ id_ender: 1 }).toArray();
-  const lastDateObj = get_last_add[0];
+  const metaDoc = await db.collection('tests').findOne({ id_ender: 1 });
 
-  const last_date = new Date(lastDateObj.lastAdded);
+  if (!metaDoc)
+    return c.json({ message: "Can't access metadata needed.", isSuccess: false });
+
+  const last_date = metaDoc ? new Date(metaDoc.lastAdded) : new Date(0);
   const current_date = new Date();
   const diffInMs = current_date.getTime() - last_date.getTime();
 
@@ -53,29 +55,38 @@ app.get('/request_add_rather', async (c) => {
   const diffInHours = diffInMs / msInHour;
 
   // Add the rather to the database if valid
-  if (diffInHours >= 1) {
-    const rather = await db.collection('tests').insertOne({
-      "id_index": lastDateObj.latest_index,
-      "left_rather": query.left_rather,
-      "right_rather": query.right_rather,
-      "total_left_votes": 0,
-      "total_right_votes": 0,
-      "date": new Date()
-    });
-
-    const updateLatestIndex = await db.collection('tests').updateOne({ id_ender: 1 }, { 
-      $inc: { latest_index: 1 }, 
-      $set: { lastAdded: new Date() } 
-    });
-
+  if (diffInHours < ratherAddDelayInHours) {
     return c.json({ 
-      message: "The rather has been added.", 
-      isSuccess: true, 
-      rather_id: rather.insertedId, 
-    });
+      message: "Wait for the time..", 
+      timeRemaining: ratherAddDelayInHours - diffInHours, 
+      isSuccess: false 
+    }, 429);
   }
 
-  return c.json({ timeRemaining: ratherAddDelayInHours - diffInHours, isSuccess: true }, 200);
+  const rather = await db.collection('tests').insertOne({
+    "id_index": metaDoc.latest_index,
+    "left_rather": query.left_rather,
+    "right_rather": query.right_rather,
+    "total_left_votes": 0,
+    "total_right_votes": 0,
+    "date": new Date()
+  });
+
+  const updateMeta = await db.collection('tests').findOneAndUpdate(
+    { id_ender: 1 }, 
+    { 
+      $inc: { latest_index: 1 }, 
+      $set: { lastAdded: new Date() } 
+    },
+    { returnDocument: 'after' }
+  );
+
+  return c.json({ 
+    message: "The rather has been added.", 
+    isSuccess: true, 
+    rather_id: rather.insertedId, 
+    total_rathers: updateMeta.latest_index
+  });
 })
 
 // Routes
