@@ -47,13 +47,15 @@ app.get('/request_add_rather', async (c) => {
   if (!metaDoc)
     return c.json({ message: "Can't access metadata needed.", isSuccess: false });
 
+  if (!metaDoc.canWrite)
+    return c.json({ message: "Writing to the database has been disabled.", isSuccess: false });
+
   const last_date = metaDoc ? new Date(metaDoc.lastAdded) : new Date(0);
   const current_date = new Date();
   const diffInMs = current_date.getTime() - last_date.getTime();
-
+  // miliseconds(in sec) * min(in sec) * hour(in min)
   const msInHour = 1000 * 60 * 60;
   const diffInHours = diffInMs / msInHour;
-
   // Add the rather to the database if valid
   if (diffInHours < ratherAddDelayInHours) {
     return c.json({ 
@@ -62,7 +64,6 @@ app.get('/request_add_rather', async (c) => {
       isSuccess: false 
     }, 429);
   }
-
   const rather = await db.collection('tests').insertOne({
     "id_index": metaDoc.latest_index,
     "left_rather": query.left_rather,
@@ -71,7 +72,6 @@ app.get('/request_add_rather', async (c) => {
     "total_right_votes": 0,
     "date": new Date()
   });
-
   const updateMeta = await db.collection('tests').findOneAndUpdate(
     { id_ender: 1 }, 
     { 
@@ -80,7 +80,6 @@ app.get('/request_add_rather', async (c) => {
     },
     { returnDocument: 'after' }
   );
-
   return c.json({ 
     message: "The rather has been added.", 
     isSuccess: true, 
